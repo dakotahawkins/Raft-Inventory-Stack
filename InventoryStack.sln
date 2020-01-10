@@ -1,0 +1,48 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InventoryStack", "InventoryStack\InventoryStack.csproj", "{41D2BDD7-E52C-4470-AC81-5F4B496CC559}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8F1AA13D-1A55-41EF-8722-CB84D420B45E}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		.gitattributes = .gitattributes
+		.gitignore = .gitignore
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModResources", "ModResources", "{3EFDB8E4-CE0A-48E6-8BF0-AD3F68336B1D}"
+	ProjectSection(SolutionItems) = preProject
+		ModResources\after.gif = ModResources\after.gif
+		ModResources\banner.jpg = ModResources\banner.jpg
+		ModResources\before.gif = ModResources\before.gif
+		ModResources\icon.jpg = ModResources\icon.jpg
+		ModResources\InventoryOrder.xcf = ModResources\InventoryOrder.xcf
+		ModResources\InventoryStack.xcf = ModResources\InventoryStack.xcf
+		ModResources\order.png = ModResources\order.png
+		ModResources\version.txt = ModResources\version.txt
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{41D2BDD7-E52C-4470-AC81-5F4B496CC559}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{41D2BDD7-E52C-4470-AC81-5F4B496CC559}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{41D2BDD7-E52C-4470-AC81-5F4B496CC559}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{41D2BDD7-E52C-4470-AC81-5F4B496CC559}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3EFDB8E4-CE0A-48E6-8BF0-AD3F68336B1D} = {8F1AA13D-1A55-41EF-8722-CB84D420B45E}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {1513B1BC-AF36-42E5-94C4-A1575DADF180}
+	EndGlobalSection
+EndGlobal
