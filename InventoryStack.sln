@@ -26,6 +26,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModResources", "ModResource
 		ModResources\version.txt = ModResources\version.txt
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{8AFA9DDF-18A9-49AC-8B62-63B7243A2B0C}"
+	ProjectSection(SolutionItems) = preProject
+		utils\prepare-release = utils\prepare-release
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +47,7 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{3EFDB8E4-CE0A-48E6-8BF0-AD3F68336B1D} = {8F1AA13D-1A55-41EF-8722-CB84D420B45E}
+		{8AFA9DDF-18A9-49AC-8B62-63B7243A2B0C} = {8F1AA13D-1A55-41EF-8722-CB84D420B45E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1513B1BC-AF36-42E5-94C4-A1575DADF180}

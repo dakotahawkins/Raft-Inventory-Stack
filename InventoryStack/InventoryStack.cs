@@ -51,7 +51,7 @@ namespace DakotaHawkins
         /// <summary>
         /// Current version of this mod
         /// </summary>
-        private const string MyCurrentVersion = "v1.0.0";
+        private const string MyCurrentVersion = "@VERSION@";
 
         /// <summary>
         /// URL root for current version of this mod
