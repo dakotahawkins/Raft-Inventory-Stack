@@ -1,5 +1,7 @@
-using Harmony;
 using System.Reflection;
+
+using Harmony;
+using UnityEngine;
 
 /// <summary>
 /// Main mod class
@@ -25,6 +27,22 @@ public class InventoryStack : Mod
     public static bool Debug { get { return false; } }
 
     /// <summary>
+    /// Prefix logs with cyan mod name
+    /// </summary>
+    private static readonly string logPrefix =
+        "[" + "<color=#00ffff>Inventory Stack</color>" + "] ";
+
+    /// <summary>
+    /// Writes a formatted log message to the console
+    /// </summary>
+    /// <param name="type">Type of log message</param>
+    /// <param name="log">Log message</param>
+    public static void Log(UnityEngine.LogType type, string log)
+    {
+        RConsole.Log(type, logPrefix + log);
+    }
+
+    /// <summary>
     /// Harmony instance
     /// </summary>
     private HarmonyInstance harmony;
@@ -42,7 +60,7 @@ public class InventoryStack : Mod
         harmony = HarmonyInstance.Create(harmonyID);
         harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-        RConsole.Log("InventoryStack has been loaded!");
+        Log(LogType.Log, "Loaded!");
     }
 
     /// <summary>
@@ -64,7 +82,8 @@ public class InventoryStack : Mod
         );
 
         Destroy(gameObject); // Please do not remove that line!
-        RConsole.Log("InventoryStack has been unloaded!");
+
+        Log(LogType.Log, "Unloaded!");
     }
 }
 
@@ -95,7 +114,10 @@ internal static class RemoveCostMultiplePatch
 
         if (null == __instance.hotbar)
         {
-            RConsole.LogError("PlayerInventory.RemoveCostMultiple.Prefix:\tnull Hotbar");
+            InventoryStack.Log(
+                LogType.Error,
+                "PlayerInventory.RemoveCostMultiple.Prefix:\tnull Hotbar"
+            );
             return;
         }
 
@@ -126,14 +148,18 @@ internal static class RemoveCostMultiplePatch
     {
         if (null == __state)
         {
-            RConsole.LogError(
+            InventoryStack.Log(
+                LogType.Error,
                 "PlayerInventory.RemoveCostMultiple.Postfix:\tnull Hotbar selected index"
             );
             return;
         }
         if (null == __instance.hotbar)
         {
-            RConsole.LogError("PlayerInventory.RemoveCostMultiple.Postfix:\tnull Hotbar");
+            InventoryStack.Log(
+                LogType.Error,
+                "PlayerInventory.RemoveCostMultiple.Postfix:\tnull Hotbar"
+            );
             return;
         }
 
@@ -163,12 +189,15 @@ internal static class RemoveCostMultiplePatch
             return;
         }
 
-        RConsole.Log(string.Format(
-            "PlayerInventory.RemoveCostMultiple.{0}:\tSelected Hotbar Selection:\t{1}\t{2}",
-            calledWhen,
-            inventory.hotbar.GetSelectedSlotIndex(),
-            null != inventory.GetSelectedHotbarItem() ?
-                inventory.GetSelectedHotbarItem().UniqueName : "Nothing"
-        ));
+        InventoryStack.Log(
+            LogType.Log,
+            string.Format(
+                "PlayerInventory.RemoveCostMultiple.{0}:\tSelected Hotbar Selection:\t{1}\t{2}",
+                calledWhen,
+                inventory.hotbar.GetSelectedSlotIndex(),
+                null != inventory.GetSelectedHotbarItem() ?
+                    inventory.GetSelectedHotbarItem().UniqueName : "Nothing"
+            )
+        );
     }
 }
