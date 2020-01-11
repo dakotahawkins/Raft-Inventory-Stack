@@ -46,9 +46,9 @@ namespace DakotaHawkins
     public class InventoryStack : Mod
     {
         /// <summary>
-        /// Enables additional debug logging
+        /// Harmony instance ID
         /// </summary>
-        public static bool Debug { get { return false; } }
+        private static readonly string harmonyID = "com.github.dakotahawkins.raft-inventory-stack";
 
         /// <summary>
         /// Prefix logs with cyan mod name
@@ -57,24 +57,17 @@ namespace DakotaHawkins
             "[" + "<color=#00ffff>Inventory Stack</color>" + "] ";
 
         /// <summary>
-        /// Writes a formatted log message to the console
+        /// Enables or disables additional debug logging
         /// </summary>
-        /// <param name="type">Type of log message</param>
-        /// <param name="log">Log message</param>
-        public static void Log(UnityEngine.LogType type, string log)
-        {
-            RConsole.Log(type, logPrefix + log);
-        }
+        /// <remarks>
+        /// Toggle with the console command "InventoryStackDebug"
+        /// </remarks>
+        private static bool debugEnabled = false;
 
         /// <summary>
         /// Harmony instance
         /// </summary>
         private HarmonyInstance harmony;
-
-        /// <summary>
-        /// Harmony instance ID
-        /// </summary>
-        private static readonly string harmonyID = "com.github.dakotahawkins.raft-inventory-stack";
 
         /// <summary>
         /// Called when mod is loaded
@@ -84,7 +77,15 @@ namespace DakotaHawkins
             harmony = HarmonyInstance.Create(harmonyID);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-            Log(LogType.Log, "Loaded!");
+            // Register "InventoryStackDebug" console command
+            RConsole.registerCommand(
+                typeof(InventoryStack),
+                "Toggles additional Inventory Stack debug logging",
+                "InventoryStackDebug",
+                ToggleDebug
+            );
+
+            Log(LogType.Log, "loaded");
         }
 
         /// <summary>
@@ -107,7 +108,47 @@ namespace DakotaHawkins
 
             Destroy(gameObject); // Please do not remove that line!
 
-            Log(LogType.Log, "Unloaded!");
+            Log(LogType.Log, "unloaded");
+        }
+
+        /// <summary>
+        /// Toggles additional Inventory Stack debug logging
+        /// </summary>
+        /// <remarks>
+        /// Called by the console command "InventoryStackDebug"
+        /// </remarks>
+        public void ToggleDebug()
+        {
+            debugEnabled = !debugEnabled;
+            Log(
+                LogType.Log,
+                string.Format("{0} additional debug logging", debugEnabled ? "Enabled" : "Disabled")
+            );
+        }
+
+        /// <summary>
+        /// Writes a formatted log message to the console
+        /// </summary>
+        /// <param name="type">Type of log message</param>
+        /// <param name="log">Log message</param>
+        private static void Log(UnityEngine.LogType type, string log)
+        {
+            RConsole.Log(type, logPrefix + log);
+        }
+
+        /// <summary>
+        /// Writes a formatted log message to the console if debugging is enabled
+        /// </summary>
+        /// <param name="type">Type of log message</param>
+        /// <param name="log">Log message</param>
+        private static void LogDebug(UnityEngine.LogType type, string log)
+        {
+            if (!debugEnabled)
+            {
+                return;
+            }
+
+            Log(type, log);
         }
 
         /// <summary>
@@ -137,7 +178,7 @@ namespace DakotaHawkins
 
                 if (null == __instance.hotbar)
                 {
-                    InventoryStack.Log(
+                    Log(
                         LogType.Error,
                         "PlayerInventory.RemoveCostMultiple.Prefix:\tnull Hotbar"
                     );
@@ -171,7 +212,7 @@ namespace DakotaHawkins
             {
                 if (null == __state)
                 {
-                    InventoryStack.Log(
+                    Log(
                         LogType.Error,
                         "PlayerInventory.RemoveCostMultiple.Postfix:\tnull Hotbar selected index"
                     );
@@ -179,7 +220,7 @@ namespace DakotaHawkins
                 }
                 if (null == __instance.hotbar)
                 {
-                    InventoryStack.Log(
+                    Log(
                         LogType.Error,
                         "PlayerInventory.RemoveCostMultiple.Postfix:\tnull Hotbar"
                     );
@@ -207,12 +248,7 @@ namespace DakotaHawkins
             /// <param name="inventory">Player's inventory</param>
             private static void DebugLogHotbarSelection(string calledWhen, PlayerInventory inventory)
             {
-                if (!InventoryStack.Debug)
-                {
-                    return;
-                }
-
-                InventoryStack.Log(
+                LogDebug(
                     LogType.Log,
                     string.Format(
                         "PlayerInventory.RemoveCostMultiple.{0}:\tSelected Hotbar Selection:\t{1}\t{2}",
