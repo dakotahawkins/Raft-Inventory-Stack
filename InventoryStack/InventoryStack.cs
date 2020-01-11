@@ -1,25 +1,28 @@
-/// MIT License
-///
-/// Copyright(c) 2020 Dakota Hawkins
-///
-/// Permission is hereby granted, free of charge, to any person obtaining a copy
-/// of this software and associated documentation files (the "Software"), to deal
-/// in the Software without restriction, including without limitation the rights
-/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-/// copies of the Software, and to permit persons to whom the Software is
-/// furnished to do so, subject to the following conditions:
-///
-/// The above copyright notice and this permission notice shall be included in all
-/// copies or substantial portions of the Software.
-///
-/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-/// SOFTWARE.
-
+//--------------------------------------------------------------------------------------------------
+// <copyright file="InventoryStack.cs" company="Dakota Hawkins">
+//     MIT License
+//
+//     Copyright(c) 2020 Dakota Hawkins
+//
+//     Permission is hereby granted, free of charge, to any person obtaining a copy
+//     of this software and associated documentation files (the "Software"), to deal
+//     in the Software without restriction, including without limitation the rights
+//     to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+//     copies of the Software, and to permit persons to whom the Software is
+//     furnished to do so, subject to the following conditions:
+//
+//     The above copyright notice and this permission notice shall be included in all
+//     copies or substantial portions of the Software.
+//
+//     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+//     IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+//     FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+//     AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+//     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+//     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+//     SOFTWARE.
+// </copyright>
+//--------------------------------------------------------------------------------------------------
 namespace DakotaHawkins
 {
     using System.Reflection;
@@ -90,12 +93,27 @@ namespace DakotaHawkins
         private HarmonyInstance harmony;
 
         /// <summary>
+        /// Toggles additional Inventory Stack debug logging
+        /// </summary>
+        /// <remarks>
+        /// Called by the console command "InventoryStackDebug"
+        /// </remarks>
+        public static void ToggleDebug()
+        {
+            debugEnabled = !debugEnabled;
+            Log(
+                LogType.Log,
+                string.Format("{0} additional debug logging", debugEnabled ? "Enabled" : "Disabled")
+            );
+        }
+
+        /// <summary>
         /// Called when mod is loaded
         /// </summary>
         public void Start()
         {
-            harmony = HarmonyInstance.Create(MyHarmonyID);
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
+            this.harmony = HarmonyInstance.Create(MyHarmonyID);
+            this.harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             // Register "InventoryStackDebug" console command
             RConsole.registerCommand(
@@ -115,35 +133,20 @@ namespace DakotaHawkins
         {
             // https://github.com/pardeike/Harmony/issues/175
             // harmony.UnpatchAll(harmonyID);
-            harmony.Unpatch(
+            this.harmony.Unpatch(
                 typeof(PlayerInventory).GetMethod("RemoveCostMultiple"),
                 HarmonyPatchType.Postfix,
                 MyHarmonyID
             );
-            harmony.Unpatch(
+            this.harmony.Unpatch(
                 typeof(PlayerInventory).GetMethod("RemoveCostMultiple"),
                 HarmonyPatchType.Prefix,
                 MyHarmonyID
             );
 
-            Destroy(gameObject); // Please do not remove that line!
+            InventoryStack.Destroy(this.gameObject); // Please do not remove that line!
 
             Log(LogType.Log, "unloaded");
-        }
-
-        /// <summary>
-        /// Toggles additional Inventory Stack debug logging
-        /// </summary>
-        /// <remarks>
-        /// Called by the console command "InventoryStackDebug"
-        /// </remarks>
-        public void ToggleDebug()
-        {
-            debugEnabled = !debugEnabled;
-            Log(
-                LogType.Log,
-                string.Format("{0} additional debug logging", debugEnabled ? "Enabled" : "Disabled")
-            );
         }
 
         /// <summary>
@@ -182,21 +185,28 @@ namespace DakotaHawkins
         private static class RemoveCostMultiplePatch
         {
             /// <summary>
-            /// PlayerInventory.RemoveCostMultiple prefix remembers the currently selected hotbar slot
-            /// index and reverses the player inventory
+            /// PlayerInventory.RemoveCostMultiple prefix remembers the currently selected hotbar
+            /// slot index and reverses the player inventory
             /// </summary>
             /// <param name="__instance">Player's inventory</param>
-            /// <param name="__state">Returns the player's currently selected hotbar slot index</param>
+            /// <param name="__state">
+            /// Returns the player's currently selected hotbar slot index
+            /// </param>
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "Code Quality",
                 "IDE0051:Remove unused private members",
                 Justification = "Dynamically called at run-time"
             )]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage(
+                "StyleCop.CSharp.NamingRules",
+                "SA1309:FieldNamesMustNotBeginWithUnderscore",
+                Justification = "Required by Harmony"
+            )]
             private static void Prefix(PlayerInventory __instance, out int? __state)
             {
                 __state = null;
 
-                if (null == __instance.hotbar)
+                if (__instance.hotbar == null)
                 {
                     Log(
                         LogType.Error,
@@ -205,8 +215,8 @@ namespace DakotaHawkins
                     return;
                 }
 
-                // Remember the currently selected hotbar slot index (necessary when crafting, but not
-                // when building)
+                // Remember the currently selected hotbar slot index (necessary when crafting, but
+                // not when building)
                 __state = __instance.hotbar.GetSelectedSlotIndex();
 
                 DebugLogHotbarSelection("Prefix Before Reverse", __instance);
@@ -218,8 +228,8 @@ namespace DakotaHawkins
             }
 
             /// <summary>
-            /// PlayerInventory.RemoveCostMultiple postfix re-reverses the player inventory to restore
-            /// its original order and resets the currently selected hotbar slot index
+            /// PlayerInventory.RemoveCostMultiple postfix re-reverses the player inventory to
+            /// restore its original order and resets the currently selected hotbar slot index
             /// </summary>
             /// <param name="__instance">Player's inventory</param>
             /// <param name="__state">Player's originally selected hotbar slot index</param>
@@ -228,9 +238,14 @@ namespace DakotaHawkins
                 "IDE0051:Remove unused private members",
                 Justification = "Dynamically called at run-time"
             )]
+            [System.Diagnostics.CodeAnalysis.SuppressMessage(
+                "StyleCop.CSharp.NamingRules",
+                "SA1309:FieldNamesMustNotBeginWithUnderscore",
+                Justification = "Required by Harmony"
+            )]
             private static void Postfix(PlayerInventory __instance, int? __state)
             {
-                if (null == __state)
+                if (__state == null)
                 {
                     Log(
                         LogType.Error,
@@ -238,7 +253,8 @@ namespace DakotaHawkins
                     );
                     return;
                 }
-                if (null == __instance.hotbar)
+
+                if (__instance.hotbar == null)
                 {
                     Log(
                         LogType.Error,
@@ -254,8 +270,8 @@ namespace DakotaHawkins
 
                 DebugLogHotbarSelection("Postfix After Reverse", __instance);
 
-                // Re-set the selected hotbar slot index to its original value (necessary when crafting,
-                // but not when building)
+                // Re-set the selected hotbar slot index to its original value (necessary when
+                // crafting, but not when building)
                 __instance.hotbar.SetSelectedSlotIndex(__state ?? default(int));
 
                 DebugLogHotbarSelection("Postfix After Reset", __instance);
@@ -266,18 +282,29 @@ namespace DakotaHawkins
             /// </summary>
             /// <param name="calledWhen">When we're logging this info</param>
             /// <param name="inventory">Player's inventory</param>
-            private static void DebugLogHotbarSelection(string calledWhen, PlayerInventory inventory)
+            private static void DebugLogHotbarSelection(
+                string calledWhen,
+                PlayerInventory inventory
+            )
             {
-                LogDebug(
-                    LogType.Log,
-                    string.Format(
-                        "PlayerInventory.RemoveCostMultiple.{0}:\tSelected Hotbar Selection:\t{1}\t{2}",
-                        calledWhen,
-                        inventory.hotbar.GetSelectedSlotIndex(),
-                        null != inventory.GetSelectedHotbarItem() ?
-                            inventory.GetSelectedHotbarItem().UniqueName : "Nothing"
-                    )
+                if (!debugEnabled)
+                {
+                    return;
+                }
+
+                string selectedHotbarItem = "Nothing";
+                if (inventory.GetSelectedHotbarItem() != null)
+                {
+                    selectedHotbarItem = inventory.GetSelectedHotbarItem().UniqueName;
+                }
+
+                string logMessage = string.Format(
+                    "PlayerInventory.RemoveCostMultiple.{0}:\tHotbar Selection:\t{1}\t{2}",
+                    calledWhen,
+                    inventory.hotbar.GetSelectedSlotIndex(),
+                    selectedHotbarItem
                 );
+                LogDebug(LogType.Log, logMessage);
             }
         }
     }
