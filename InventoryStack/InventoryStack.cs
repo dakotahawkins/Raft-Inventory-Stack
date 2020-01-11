@@ -46,11 +46,6 @@ public class InventoryStack : Mod
     }
 
     /// <summary>
-    /// Called every frame (unused)
-    /// </summary>
-    public void Update() { }
-
-    /// <summary>
     /// Called when mod is unloaded
     /// </summary>
     public void OnModUnload()
