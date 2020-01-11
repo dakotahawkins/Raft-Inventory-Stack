@@ -37,23 +37,43 @@ namespace DakotaHawkins
         + "instead of the \"beginning.\""
     )]
     [ModAuthor("Dakota Hawkins")]
-    [ModIconUrl("https://raw.githubusercontent.com/dakotahawkins/Raft-Inventory-Stack/master/ModResources/icon.jpg")] // 128x128px .jpg
-    [ModWallpaperUrl("https://raw.githubusercontent.com/dakotahawkins/Raft-Inventory-Stack/master/ModResources/banner.jpg")] // 330x100px .jpg
-    [ModVersionCheckUrl("https://raw.githubusercontent.com/dakotahawkins/Raft-Inventory-Stack/master/ModResources/version.txt")]
-    [ModVersion("v1.0.0")]
-    [RaftVersion("Update 10.07 4497220")] // Recommended version
+    [ModIconUrl(MyCurrentUrlRoot + "icon.jpg")] // 128x128px .jpg
+    [ModWallpaperUrl(MyCurrentUrlRoot + "banner.jpg")] // 330x100px .jpg
+    [ModVersionCheckUrl(MyCurrentUrlRoot + "version.txt")]
+    [ModVersion(MyCurrentVersion)]
+    [RaftVersion(RaftVersion)]
     [ModIsPermanent(false)]
     public class InventoryStack : Mod
     {
         /// <summary>
+        /// Current version of this mod
+        /// </summary>
+        private const string MyCurrentVersion = "v1.0.0";
+
+        /// <summary>
+        /// URL root for current version of this mod
+        /// </summary>
+        private const string MyCurrentUrlRoot =
+            "https://raw.githubusercontent.com/"
+            + "dakotahawkins/"
+            + "Raft-Inventory-Stack/"
+            + MyCurrentVersion + "/"
+            + "ModResources/";
+
+        /// <summary>
+        /// Supported/recommended version of Raft
+        /// </summary>
+        private const string RaftVersion = "Update 10.07 4497220";
+
+        /// <summary>
         /// Harmony instance ID
         /// </summary>
-        private static readonly string harmonyID = "com.github.dakotahawkins.raft-inventory-stack";
+        private const string MyHarmonyID = "com.github.dakotahawkins.raft-inventory-stack";
 
         /// <summary>
         /// Prefix logs with cyan mod name
         /// </summary>
-        private static readonly string logPrefix =
+        private const string MyLogPrefix =
             "[" + "<color=#00ffff>Inventory Stack</color>" + "] ";
 
         /// <summary>
@@ -74,7 +94,7 @@ namespace DakotaHawkins
         /// </summary>
         public void Start()
         {
-            harmony = HarmonyInstance.Create(harmonyID);
+            harmony = HarmonyInstance.Create(MyHarmonyID);
             harmony.PatchAll(Assembly.GetExecutingAssembly());
 
             // Register "InventoryStackDebug" console command
@@ -98,12 +118,12 @@ namespace DakotaHawkins
             harmony.Unpatch(
                 typeof(PlayerInventory).GetMethod("RemoveCostMultiple"),
                 HarmonyPatchType.Postfix,
-                harmonyID
+                MyHarmonyID
             );
             harmony.Unpatch(
                 typeof(PlayerInventory).GetMethod("RemoveCostMultiple"),
                 HarmonyPatchType.Prefix,
-                harmonyID
+                MyHarmonyID
             );
 
             Destroy(gameObject); // Please do not remove that line!
@@ -133,7 +153,7 @@ namespace DakotaHawkins
         /// <param name="log">Log message</param>
         private static void Log(UnityEngine.LogType type, string log)
         {
-            RConsole.Log(type, logPrefix + log);
+            RConsole.Log(type, MyLogPrefix + log);
         }
 
         /// <summary>
