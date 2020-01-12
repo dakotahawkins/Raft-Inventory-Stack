@@ -3,7 +3,7 @@
 *.sln text eol=crlf
 *.*proj text eol=crlf
 *.*proj.* text eol=crlf
-Settings.StyleCop text eol=crlf
+packages.config text eol=crlf
 
 *.[Jj][Pp][Gg] binary
 *.[Gg][Ii][Ff] binary

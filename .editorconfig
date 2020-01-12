@@ -27,20 +27,18 @@ dotnet_style_qualification_for_method = false:none
 dotnet_style_qualification_for_event = false:none
 dotnet_style_qualification_for_field = false:none
 
+[*.json]
+indent_size = 2
+
 [*.md]
 trim_trailing_whitespace = false
 
-[*.{sln,*proj,*proj.*}]
+[{*.{sln,*proj,*proj.*},packages.config}]
 charset = unset
 end_of_line = crlf
 insert_final_newline = unset
 indent_style = unset
 indent_size = unset
-
-[Settings.StyleCop]
-end_of_line = crlf
-indent_size = 2
-insert_final_newline = unset
 
 [utils/prepare-release]
 max_line_length = 100

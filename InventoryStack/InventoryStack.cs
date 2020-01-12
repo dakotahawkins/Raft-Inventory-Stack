@@ -1,5 +1,8 @@
 //--------------------------------------------------------------------------------------------------
 // <copyright file="InventoryStack.cs" company="Dakota Hawkins">
+//     Copyright (c) Dakota Hawkins. All rights reserved.
+// </copyright>
+// <license>
 //     MIT License
 //
 //     Copyright(c) 2020 Dakota Hawkins
@@ -21,17 +24,22 @@
 //     LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 //     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 //     SOFTWARE.
-// </copyright>
+// </license>
 //--------------------------------------------------------------------------------------------------
+#pragma warning disable 1692 // Invalid number, triggered from the mod loader for the SA* pragmas
+#pragma warning disable SA1009 // ClosingParenthesisMustBeSpacedCorrectly
+#pragma warning disable SA1111 // ClosingParenthesisMustBeOnLineOfLastParameter
+#pragma warning restore 1692
 namespace DakotaHawkins
 {
+    using System.Globalization;
     using System.Reflection;
 
     using Harmony;
     using UnityEngine;
 
     /// <summary>
-    /// Main mod class
+    /// Main mod class.
     /// </summary>
     [ModTitle("Inventory Stack")]
     [ModDescription(
@@ -49,12 +57,12 @@ namespace DakotaHawkins
     public class InventoryStack : Mod
     {
         /// <summary>
-        /// Current version of this mod
+        /// Current version of this mod.
         /// </summary>
         private const string MyCurrentVersion = "@VERSION@";
 
         /// <summary>
-        /// URL root for current version of this mod
+        /// URL root for current version of this mod.
         /// </summary>
         private const string MyCurrentUrlRoot =
             "https://raw.githubusercontent.com/"
@@ -64,51 +72,55 @@ namespace DakotaHawkins
             + "ModResources/";
 
         /// <summary>
-        /// Supported/recommended version of Raft
+        /// Supported/recommended version of Raft.
         /// </summary>
         private const string RaftVersion = "Update 10.07 4497220";
 
         /// <summary>
-        /// Harmony instance ID
+        /// Harmony instance ID.
         /// </summary>
         private const string MyHarmonyID = "com.github.dakotahawkins.raft-inventory-stack";
 
         /// <summary>
-        /// Prefix logs with cyan mod name
+        /// Prefix logs with cyan mod name.
         /// </summary>
         private const string MyLogPrefix =
             "[" + "<color=#00ffff>Inventory Stack</color>" + "] ";
 
         /// <summary>
-        /// Enables or disables additional debug logging
+        /// Enables or disables additional debug logging.
         /// </summary>
         /// <remarks>
-        /// Toggle with the console command "InventoryStackDebug"
+        /// Toggle with the console command "InventoryStackDebug".
         /// </remarks>
         private static bool debugEnabled = false;
 
         /// <summary>
-        /// Harmony instance
+        /// Harmony instance.
         /// </summary>
         private HarmonyInstance harmony;
 
         /// <summary>
-        /// Toggles additional Inventory Stack debug logging
+        /// Toggles additional Inventory Stack debug logging.
         /// </summary>
         /// <remarks>
-        /// Called by the console command "InventoryStackDebug"
+        /// Called by the console command "InventoryStackDebug".
         /// </remarks>
         public static void ToggleDebug()
         {
             debugEnabled = !debugEnabled;
             Log(
                 LogType.Log,
-                string.Format("{0} additional debug logging", debugEnabled ? "Enabled" : "Disabled")
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    "{0} additional debug logging",
+                    debugEnabled ? "Enabled" : "Disabled"
+                )
             );
         }
 
         /// <summary>
-        /// Called when mod is loaded
+        /// Called when mod is loaded.
         /// </summary>
         public void Start()
         {
@@ -127,7 +139,7 @@ namespace DakotaHawkins
         }
 
         /// <summary>
-        /// Called when mod is unloaded
+        /// Called when mod is unloaded.
         /// </summary>
         public void OnModUnload()
         {
@@ -150,20 +162,20 @@ namespace DakotaHawkins
         }
 
         /// <summary>
-        /// Writes a formatted log message to the console
+        /// Writes a formatted log message to the console.
         /// </summary>
-        /// <param name="type">Type of log message</param>
-        /// <param name="log">Log message</param>
+        /// <param name="type">Type of log message.</param>
+        /// <param name="log">Log message.</param>
         private static void Log(UnityEngine.LogType type, string log)
         {
             RConsole.Log(type, MyLogPrefix + log);
         }
 
         /// <summary>
-        /// Writes a formatted log message to the console if debugging is enabled
+        /// Writes a formatted log message to the console if debugging is enabled.
         /// </summary>
-        /// <param name="type">Type of log message</param>
-        /// <param name="log">Log message</param>
+        /// <param name="type">Type of log message.</param>
+        /// <param name="log">Log message.</param>
         private static void LogDebug(UnityEngine.LogType type, string log)
         {
             if (!debugEnabled)
@@ -175,22 +187,27 @@ namespace DakotaHawkins
         }
 
         /// <summary>
-        /// Patches the PlayerInventory.RemoveCostMultiple method
+        /// Patches the PlayerInventory.RemoveCostMultiple method.
         /// </summary>
         /// <remarks>
         /// Adds prefix and postfix functionality to reverse player inventory order before and after
-        /// items are removed for building or crafting
+        /// items are removed for building or crafting.
         /// </remarks>
         [HarmonyPatch(typeof(PlayerInventory), "RemoveCostMultiple")]
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "CA1812:Avoid uninstantiated internal classes",
+            Justification = "Dynamically instantiated at run-time"
+        )]
         private static class RemoveCostMultiplePatch
         {
             /// <summary>
             /// PlayerInventory.RemoveCostMultiple prefix remembers the currently selected hotbar
-            /// slot index and reverses the player inventory
+            /// slot index and reverses the player inventory.
             /// </summary>
-            /// <param name="__instance">Player's inventory</param>
+            /// <param name="__instance">Player's inventory.</param>
             /// <param name="__state">
-            /// Returns the player's currently selected hotbar slot index
+            /// Returns the player's currently selected hotbar slot index.
             /// </param>
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "Code Quality",
@@ -199,7 +216,7 @@ namespace DakotaHawkins
             )]
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "StyleCop.CSharp.NamingRules",
-                "SA1309:FieldNamesMustNotBeginWithUnderscore",
+                "SA1313:Parameter names should begin with lower-case letter",
                 Justification = "Required by Harmony"
             )]
             private static void Prefix(PlayerInventory __instance, out int? __state)
@@ -229,10 +246,10 @@ namespace DakotaHawkins
 
             /// <summary>
             /// PlayerInventory.RemoveCostMultiple postfix re-reverses the player inventory to
-            /// restore its original order and resets the currently selected hotbar slot index
+            /// restore its original order and resets the currently selected hotbar slot index.
             /// </summary>
-            /// <param name="__instance">Player's inventory</param>
-            /// <param name="__state">Player's originally selected hotbar slot index</param>
+            /// <param name="__instance">Player's inventory.</param>
+            /// <param name="__state">Player's originally selected hotbar slot index.</param>
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "Code Quality",
                 "IDE0051:Remove unused private members",
@@ -240,7 +257,7 @@ namespace DakotaHawkins
             )]
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "StyleCop.CSharp.NamingRules",
-                "SA1309:FieldNamesMustNotBeginWithUnderscore",
+                "SA1313:Parameter names should begin with lower-case letter",
                 Justification = "Required by Harmony"
             )]
             private static void Postfix(PlayerInventory __instance, int? __state)
@@ -278,10 +295,10 @@ namespace DakotaHawkins
             }
 
             /// <summary>
-            /// Utility function to log the player's hotbar selection
+            /// Utility function to log the player's hotbar selection.
             /// </summary>
-            /// <param name="calledWhen">When we're logging this info</param>
-            /// <param name="inventory">Player's inventory</param>
+            /// <param name="calledWhen">When we're logging this info.</param>
+            /// <param name="inventory">Player's inventory.</param>
             private static void DebugLogHotbarSelection(
                 string calledWhen,
                 PlayerInventory inventory
@@ -299,6 +316,7 @@ namespace DakotaHawkins
                 }
 
                 string logMessage = string.Format(
+                    CultureInfo.CurrentCulture,
                     "PlayerInventory.RemoveCostMultiple.{0}:\tHotbar Selection:\t{1}\t{2}",
                     calledWhen,
                     inventory.hotbar.GetSelectedSlotIndex(),
