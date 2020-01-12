@@ -13,12 +13,12 @@
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <LangVersion>7.0</LangVersion>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>.\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,6 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -272,26 +271,14 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PreBuildEvent>
-===========WARNING============
-
-
-PLEASE DO NOT COMPILE THE MOD.
-THE MOD IS THE RAW .CS FILE.
-
-
-============================
-</PreBuildEvent>
+    </PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PostBuildEvent>
-===========WARNING============
-
-
-PLEASE DO NOT COMPILE THE MOD.
-THE MOD IS THE RAW .CS FILE.
-
-
-============================
-</PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
+  <Target Name="CleanAfterBuild" AfterTargets="AfterBuild">
+    <MSBuild Projects="$(MSBuildProjectFile)" Targets="Clean" Properties="FakeProperty=forceRebuildToCleanAgain" />
+    <Message Importance="high" Text="Build output will always be cleaned, since the mod is the raw .cs file." />
+  </Target>
 </Project>
