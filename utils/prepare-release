@@ -6,8 +6,6 @@
 # Usage:
 #  prepare-release (major|minor|patch)
 
-# git clean -dfx -- ./release/ > /dev/null 2>&1
-
 main() {
     local release_type=
     while [[ $# -gt 0 ]]; do
