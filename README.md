@@ -1,6 +1,6 @@
 # Inventory Stack
 
-A mod for the game [Raft](https://raft-game.com/) that makes it easier for you to stay organized!
+A _minimal_ mod for the game [Raft](https://raft-game.com/) that makes it easier for you to stay organized!
 
 In Raft, items you collect are added to the [first](#inventory-order) available slot in your inventory. Unfortunately, items consumed by building or crafting are _removed_ from the first available slot in your inventory! This makes it difficult to maintain whatever layout of items and materials you have with you without constant manual adjustments.
 
@@ -17,6 +17,10 @@ In Raft, items you collect are added to the [first](#inventory-order) available 
 # Installation
 
 Following instructions from [raftmodding.com](https://www.raftmodding.com/), download the Raft [mod loader](https://www.raftmodding.com/download) and place the latest release of [InventoryStack.cs](InventoryStack/InventoryStack.cs) in your mods folder.
+
+# Console Commands
+
+- `InventoryStackDebug`: Toggle additional debug logging
 
 # Inventory Order
 
