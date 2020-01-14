@@ -45,7 +45,7 @@ namespace DakotaHawkins
     [ModDescription(
         "Makes it easier to stay organized!"
         + " Building and crafting will use items from the \"end\" of your inventory"
-        + "instead of the \"beginning.\""
+        + " instead of the \"beginning.\""
     )]
     [ModAuthor("Dakota Hawkins")]
     [ModIconUrl(MyCurrentUrlRoot + "icon.jpg")] // 128x128px .jpg
