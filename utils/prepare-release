@@ -4,24 +4,30 @@
 # Prepares a new major, minor, or patch release
 #
 # Usage:
-#  prepare-release (major|minor|patch)
+#  prepare-release (test|major|minor|patch)
 
 main() {
     local release_type=
+    local usage_error="Invalid argument(s). Usage: prepare-release (test|major|minor|patch)"
     while [[ $# -gt 0 ]]; do
         case "$1" in
-            major|minor|patch)
+            test|major|minor|patch)
+                [[ -z "$release_type" ]] || {
+                    error_exit "$usage_error"
+                }
                 release_type="$1"
                 shift
                 ;;
             *)
-                error_exit "Unrecognized argument. Usage: prepare-release (major|minor|patch)"
+                error_exit "$usage_error"
                 ;;
         esac
     done
 
-    git diff --quiet HEAD 2>/dev/null || {
-        error_exit "There are uncommitted changes."
+    [[ "$release_type" != "test" ]] && {
+        git diff --quiet HEAD 2>/dev/null || {
+            error_exit "There are uncommitted changes."
+        }
     }
 
     local MOD_NAME="InventoryStack"
@@ -51,13 +57,22 @@ main() {
         error_exit "Current version not found."
     }
 
-    local new_version="v$("$SEMVER_TOOL" bump $release_type $current_version 2>/dev/null)"
-    [[ $? -eq 0 ]] || {
-        error_exit "semver-tool failed to bump $current_version one $release_type level."
-    }
+    local new_version=
+    if [[ "$release_type" != "test" ]]; then
+        new_version="v$("$SEMVER_TOOL" bump $release_type $current_version 2>/dev/null)"
+        [[ $? -eq 0 ]] || {
+            error_exit "semver-tool failed to bump $current_version one $release_type level."
+        }
+    else
+        new_version="$current_version"
+    fi
 
     echo
-    echo "Bumping $current_version one $release_type level to $new_version"
+    if [[ "$release_type" != "test" ]]; then
+        echo "Bumping $current_version one $release_type level to $new_version"
+    else
+        echo "Creating test release for working code."
+    fi
     echo
 
     ################################################################################################
@@ -83,6 +98,10 @@ main() {
         error_exit "Failed to update version number in release mod source."
     }
 
+    [[ "$release_type" = "test" ]] && {
+        echo "Done!"
+        return
+    }
 
     ################################################################################################
     # Write and edit changelog in release dir
