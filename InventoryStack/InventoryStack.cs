@@ -52,7 +52,7 @@ namespace DakotaHawkins
     [ModAuthor("Dakota Hawkins")]
     [ModIconUrl(MyCurrentUrlRoot + "icon.jpg")] // 128x128px .jpg
     [ModWallpaperUrl(MyCurrentUrlRoot + "banner.jpg")] // 330x100px .jpg
-    [ModVersionCheckUrl(MyCurrentUrlRoot + "version.txt")]
+    [ModVersionCheckUrl("https://www.raftmodding.com/api/v1/mods/inventory-stack/version.txt")]
     [ModVersion(MyCurrentVersion)]
     [RaftVersion(RaftVersion)]
     [ModIsPermanent(false)]
