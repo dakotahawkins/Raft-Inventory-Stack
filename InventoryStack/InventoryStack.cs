@@ -32,7 +32,9 @@
 #pragma warning restore 1692
 namespace DakotaHawkins
 {
+    using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
     using System.Reflection;
 
     using Harmony;
@@ -101,22 +103,30 @@ namespace DakotaHawkins
         private HarmonyInstance harmony;
 
         /// <summary>
-        /// Toggles additional Inventory Stack debug logging.
+        /// Runs an inventory stack command or prints help.
         /// </summary>
         /// <remarks>
-        /// Called by the console command "InventoryStackDebug".
+        /// Called by the console command "InventoryStack".
         /// </remarks>
-        public static void ToggleDebug()
+        public static void RunCommand()
         {
-            debugEnabled = !debugEnabled;
-            Log(
-                LogType.Log,
-                string.Format(
-                    CultureInfo.CurrentCulture,
-                    "{0} additional debug logging",
-                    debugEnabled ? "Enabled" : "Disabled"
-                )
-            );
+            var command = RConsole.lcargs.Skip(1).FirstOrDefault();
+            if (command.IsNullOrEmpty() || new[] { "h", "help" }.Contains(command))
+            {
+                PrintCommandHelp();
+                return;
+            }
+
+            if (new[] { "d", "debug" }.Contains(command))
+            {
+                ToggleDebug();
+                return;
+            }
+
+            PrintCommandHelp("Unrecognized command.");
+
+            // Future use:
+            // var commandArgs = RConsole.lcargs.Skip(2).ToList();
         }
 
         /// <summary>
@@ -127,12 +137,12 @@ namespace DakotaHawkins
             this.harmony = HarmonyInstance.Create(MyHarmonyID);
             this.harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-            // Register "InventoryStackDebug" console command
+            // Register "InventoryStack" console command
             RConsole.registerCommand(
                 typeof(InventoryStack),
-                "Toggles additional Inventory Stack debug logging",
-                "InventoryStackDebug",
-                ToggleDebug
+                "Usage: InventoryStack [command]. Use the command \"help\" for a list of commands.",
+                "InventoryStack",
+                RunCommand
             );
 
             Log(LogType.Log, "loaded");
@@ -184,6 +194,62 @@ namespace DakotaHawkins
             }
 
             Log(type, log);
+        }
+
+        /// <summary>
+        /// Prints the command help to the console.
+        /// </summary>
+        /// <param name="error">Optional error message.</param>
+        private static void PrintCommandHelp(string error = "")
+        {
+            var helpMessage = new List<string>
+            {
+                string.Empty,
+                "Usage: <b>InventoryStack <i>[command]</i></b>",
+                string.Empty,
+                "Executes the specified InventoryStack command.",
+                string.Empty,
+                "Commands:",
+                "    <b>h</b>, <b>help</b>:   Displays this message",
+                "    <b>d</b>, <b>debug</b>:  Toggles additional debug logging",
+                string.Empty,
+            };
+
+            if (!error.IsNullOrEmpty())
+            {
+                helpMessage.InsertRange(
+                    0,
+                    new List<string>
+                    {
+                        string.Empty,
+                        "Error: " + error,
+                    }
+                );
+            }
+
+            foreach (var helpLine in helpMessage)
+            {
+                Log(LogType.Log, helpLine);
+            }
+        }
+
+        /// <summary>
+        /// Toggles additional Inventory Stack debug logging.
+        /// </summary>
+        /// <remarks>
+        /// Called by the console command "InventoryStackDebug".
+        /// </remarks>
+        private static void ToggleDebug()
+        {
+            debugEnabled = !debugEnabled;
+            Log(
+                LogType.Log,
+                string.Format(
+                    CultureInfo.CurrentCulture,
+                    "{0} additional debug logging",
+                    debugEnabled ? "Enabled" : "Disabled"
+                )
+            );
         }
 
         /// <summary>

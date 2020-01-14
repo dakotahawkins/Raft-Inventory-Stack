@@ -18,9 +18,18 @@ In Raft, items you collect are added to the [first](#inventory-order) available 
 
 Following instructions from [raftmodding.com](https://www.raftmodding.com/), download the Raft [mod loader](https://www.raftmodding.com/download) and place the latest release of [InventoryStack.cs](InventoryStack/InventoryStack.cs) in your mods folder.
 
-# Console Commands
+# `InventoryStack` Console Command
 
-- `InventoryStackDebug`: Toggle additional debug logging
+## Usage
+
+`InventoryStack `*`[command]`*
+
+### Commands
+
+- `h`, `help`
+  - Display help message
+- `d`, `debug`
+  - Toggle additional debug logging
 
 # Inventory Order
 
