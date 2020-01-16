@@ -93,7 +93,7 @@ namespace DakotaHawkins
         /// Enables or disables additional debug logging.
         /// </summary>
         /// <remarks>
-        /// Toggle with the console command "InventoryStackDebug".
+        /// Toggle with the console command "InventoryStack ( d | debug )".
         /// </remarks>
         private static bool debugEnabled = false;
 
@@ -200,6 +200,9 @@ namespace DakotaHawkins
         /// Prints the command help to the console.
         /// </summary>
         /// <param name="error">Optional error message.</param>
+        /// <remarks>
+        /// Called by the console command "InventoryStack ( h | help )".
+        /// </remarks>
         private static void PrintCommandHelp(string error = "")
         {
             var helpMessage = new List<string>
@@ -237,7 +240,7 @@ namespace DakotaHawkins
         /// Toggles additional Inventory Stack debug logging.
         /// </summary>
         /// <remarks>
-        /// Called by the console command "InventoryStackDebug".
+        /// Called by the console command "InventoryStack ( d | debug )".
         /// </remarks>
         private static void ToggleDebug()
         {
