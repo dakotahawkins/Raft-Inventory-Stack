@@ -22,6 +22,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModResources", "ModResource
 		ModResources\InventoryOrder.xcf = ModResources\InventoryOrder.xcf
 		ModResources\InventoryStack.xcf = ModResources\InventoryStack.xcf
 		ModResources\order.png = ModResources\order.png
+		ModResources\StackOfBooks.svg = ModResources\StackOfBooks.svg
 		ModResources\version.txt = ModResources\version.txt
 	EndProjectSection
 EndProject
