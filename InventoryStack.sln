@@ -21,6 +21,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ModResources", "ModResource
 		ModResources\icon.jpg = ModResources\icon.jpg
 		ModResources\InventoryOrder.xcf = ModResources\InventoryOrder.xcf
 		ModResources\InventoryStack.xcf = ModResources\InventoryStack.xcf
+		ModResources\modinfo.json = ModResources\modinfo.json
 		ModResources\order.png = ModResources\order.png
 		ModResources\StackOfBooks.svg = ModResources\StackOfBooks.svg
 		ModResources\version.txt = ModResources\version.txt
@@ -33,7 +34,30 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "utils", "utils", "{8AFA9DDF
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "raft-prepare-release", "raft-prepare-release", "{12C70D94-3D78-43E9-B586-DD5F8C343395}"
 	ProjectSection(SolutionItems) = preProject
-		utils\raft-prepare-release\prepare-release = utils\raft-prepare-release\prepare-release
+		utils\raft-prepare-release\.editorconfig = utils\raft-prepare-release\.editorconfig
+		utils\raft-prepare-release\.gitattributes = utils\raft-prepare-release\.gitattributes
+		utils\raft-prepare-release\.gitignore = utils\raft-prepare-release\.gitignore
+		utils\raft-prepare-release\.gitmodules = utils\raft-prepare-release\.gitmodules
+		utils\raft-prepare-release\LICENSE = utils\raft-prepare-release\LICENSE
+		utils\raft-prepare-release\PrepareRelease.ps1 = utils\raft-prepare-release\PrepareRelease.ps1
+		utils\raft-prepare-release\README.md = utils\raft-prepare-release\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "modules", "modules", "{4EDFA5A2-3503-4C24-8F98-57BE3D4B1C60}"
+	ProjectSection(SolutionItems) = preProject
+		utils\raft-prepare-release\modules\Git.psm1 = utils\raft-prepare-release\modules\Git.psm1
+		utils\raft-prepare-release\modules\Paths.psm1 = utils\raft-prepare-release\modules\Paths.psm1
+		utils\raft-prepare-release\modules\Version.psm1 = utils\raft-prepare-release\modules\Version.psm1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Get-RaftDir", "Get-RaftDir", "{BC0B8732-D3AD-419D-BDE5-E73B9A00AD34}"
+	ProjectSection(SolutionItems) = preProject
+		utils\raft-prepare-release\modules\Get-RaftDir\.editorconfig = utils\raft-prepare-release\modules\Get-RaftDir\.editorconfig
+		utils\raft-prepare-release\modules\Get-RaftDir\.gitattributes = utils\raft-prepare-release\modules\Get-RaftDir\.gitattributes
+		utils\raft-prepare-release\modules\Get-RaftDir\.gitignore = utils\raft-prepare-release\modules\Get-RaftDir\.gitignore
+		utils\raft-prepare-release\modules\Get-RaftDir\LICENSE = utils\raft-prepare-release\modules\Get-RaftDir\LICENSE
+		utils\raft-prepare-release\modules\Get-RaftDir\RaftDir.psm1 = utils\raft-prepare-release\modules\Get-RaftDir\RaftDir.psm1
+		utils\raft-prepare-release\modules\Get-RaftDir\README.md = utils\raft-prepare-release\modules\Get-RaftDir\README.md
 	EndProjectSection
 EndProject
 Global
@@ -54,6 +78,8 @@ Global
 		{3EFDB8E4-CE0A-48E6-8BF0-AD3F68336B1D} = {8F1AA13D-1A55-41EF-8722-CB84D420B45E}
 		{8AFA9DDF-18A9-49AC-8B62-63B7243A2B0C} = {8F1AA13D-1A55-41EF-8722-CB84D420B45E}
 		{12C70D94-3D78-43E9-B586-DD5F8C343395} = {8AFA9DDF-18A9-49AC-8B62-63B7243A2B0C}
+		{4EDFA5A2-3503-4C24-8F98-57BE3D4B1C60} = {12C70D94-3D78-43E9-B586-DD5F8C343395}
+		{BC0B8732-D3AD-419D-BDE5-E73B9A00AD34} = {4EDFA5A2-3503-4C24-8F98-57BE3D4B1C60}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1513B1BC-AF36-42E5-94C4-A1575DADF180}

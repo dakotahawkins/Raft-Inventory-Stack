@@ -1,0 +1,13 @@
+{
+  "name": "Inventory Stack",
+  "author": "Dakota Hawkins",
+  "description": "Makes it easier to stay organized! Building and crafting will use items from the \"end\" of your inventory instead of the \"beginning.\"",
+  "version": "@VERSION@",
+  "license": "MIT License",
+  "icon": "icon.png",
+  "banner": "banner.jpg",
+  "gameVersion": "1.0.4",
+  "updateUrl": "https://www.raftmodding.com/api/v1/mods/inventory-stack/version.txt",
+  "isModPermanent": false,
+  "excludedFiles": []
+}

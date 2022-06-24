@@ -5,7 +5,7 @@
 // <license>
 //     MIT License
 //
-//     Copyright(c) 2020 Dakota Hawkins
+//     Copyright(c) 2022 Dakota Hawkins
 //
 //     Permission is hereby granted, free of charge, to any person obtaining a copy
 //     of this software and associated documentation files (the "Software"), to deal
@@ -37,47 +37,14 @@ namespace DakotaHawkins
     using System.Linq;
     using System.Reflection;
 
-    using Harmony;
+    using HarmonyLib;
     using UnityEngine;
 
     /// <summary>
     /// Main mod class.
     /// </summary>
-    [ModTitle("Inventory Stack")]
-    [ModDescription(
-        "Makes it easier to stay organized!"
-        + " Building and crafting will use items from the \"end\" of your inventory"
-        + " instead of the \"beginning.\""
-    )]
-    [ModAuthor("Dakota Hawkins")]
-    [ModIconUrl(MyCurrentUrlRoot + "icon.jpg")] // 256x256px
-    [ModWallpaperUrl(MyCurrentUrlRoot + "banner.jpg")] // 660x200px
-    [ModVersionCheckUrl("https://www.raftmodding.com/api/v1/mods/inventory-stack/version.txt")]
-    [ModVersion(MyCurrentVersion)]
-    [RaftVersion(RaftVersion)]
-    [ModIsPermanent(false)]
     public class InventoryStack : Mod
     {
-        /// <summary>
-        /// Current version of this mod.
-        /// </summary>
-        private const string MyCurrentVersion = "@VERSION@";
-
-        /// <summary>
-        /// URL root for current version of this mod.
-        /// </summary>
-        private const string MyCurrentUrlRoot =
-            "https://raw.githubusercontent.com/"
-            + "dakotahawkins/"
-            + "Raft-Inventory-Stack/"
-            + MyCurrentVersion + "/"
-            + "ModResources/";
-
-        /// <summary>
-        /// Supported/recommended version of Raft.
-        /// </summary>
-        private const string RaftVersion = "Update 10.07 4497220";
-
         /// <summary>
         /// Harmony instance ID.
         /// </summary>
@@ -95,12 +62,17 @@ namespace DakotaHawkins
         /// <remarks>
         /// Toggle with the console command "InventoryStack ( d | debug )".
         /// </remarks>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "Performance",
+            "CA1805:Do not initialize unnecessarily",
+            Justification = "Clarity")
+        ]
         private static bool debugEnabled = false;
 
         /// <summary>
         /// Harmony instance.
         /// </summary>
-        private HarmonyInstance harmony;
+        private Harmony harmony;
 
         /// <summary>
         /// Runs an inventory stack command or prints help.
@@ -108,9 +80,11 @@ namespace DakotaHawkins
         /// <remarks>
         /// Called by the console command "InventoryStack".
         /// </remarks>
-        public static void RunCommand()
+        /// <param name="args">Individual command.</param>
+        [ConsoleCommand(name: "InventoryStack", docs: "Run \"InventoryStack ( h | help )\" for more information.")]
+        public static void RunCommand(string[] args)
         {
-            var command = RConsole.lcargs.Skip(1).FirstOrDefault();
+            var command = args.FirstOrDefault();
             if (command.IsNullOrEmpty() || new[] { "h", "help" }.Contains(command))
             {
                 PrintCommandHelp();
@@ -124,9 +98,6 @@ namespace DakotaHawkins
             }
 
             PrintCommandHelp("Unrecognized command.");
-
-            // Future use:
-            // var commandArgs = RConsole.lcargs.Skip(2).ToList();
         }
 
         /// <summary>
@@ -134,17 +105,8 @@ namespace DakotaHawkins
         /// </summary>
         public void Start()
         {
-            this.harmony = HarmonyInstance.Create(MyHarmonyID);
+            this.harmony = new Harmony(MyHarmonyID);
             this.harmony.PatchAll(Assembly.GetExecutingAssembly());
-
-            // Register "InventoryStack" console command
-            RConsole.registerCommand(
-                typeof(InventoryStack),
-                "Usage: InventoryStack [command]. Use the command \"help\" for a list of commands.",
-                "InventoryStack",
-                RunCommand
-            );
-
             Log(LogType.Log, "loaded");
         }
 
@@ -153,21 +115,8 @@ namespace DakotaHawkins
         /// </summary>
         public void OnModUnload()
         {
-            // https://github.com/pardeike/Harmony/issues/175
-            // harmony.UnpatchAll(harmonyID);
-            this.harmony.Unpatch(
-                typeof(PlayerInventory).GetMethod("RemoveCostMultiple"),
-                HarmonyPatchType.Postfix,
-                MyHarmonyID
-            );
-            this.harmony.Unpatch(
-                typeof(PlayerInventory).GetMethod("RemoveCostMultiple"),
-                HarmonyPatchType.Prefix,
-                MyHarmonyID
-            );
-
+            this.harmony.UnpatchAll(MyHarmonyID);
             InventoryStack.Destroy(this.gameObject); // Please do not remove that line!
-
             Log(LogType.Log, "unloaded");
         }
 
@@ -178,7 +127,24 @@ namespace DakotaHawkins
         /// <param name="log">Log message.</param>
         private static void Log(UnityEngine.LogType type, string log)
         {
-            RConsole.Log(type, MyLogPrefix + log);
+            log = MyLogPrefix + log;
+            switch (type)
+            {
+                case LogType.Error:
+                case LogType.Exception:
+                    Debug.LogError(log);
+                    break;
+                case LogType.Assert:
+                    Debug.LogAssertion(log);
+                    break;
+                case LogType.Warning:
+                    Debug.LogWarning(log);
+                    break;
+                case LogType.Log:
+                default:
+                    Debug.Log(log);
+                    break;
+            }
         }
 
         /// <summary>
@@ -242,6 +208,7 @@ namespace DakotaHawkins
         /// <remarks>
         /// Called by the console command "InventoryStack ( d | debug )".
         /// </remarks>
+        [ConsoleCommand(name: "debug", docs: "")]
         private static void ToggleDebug()
         {
             debugEnabled = !debugEnabled;
@@ -256,13 +223,15 @@ namespace DakotaHawkins
         }
 
         /// <summary>
-        /// Patches the PlayerInventory.RemoveCostMultiple method.
+        /// Patches the Inventory RemoveCostMultiple and RemoveCostMultipleIncludeSecondaryInventories
+        /// methods.
         /// </summary>
         /// <remarks>
-        /// Adds prefix and postfix functionality to reverse player inventory order before and after
-        /// items are removed for building or crafting.
+        /// Adds prefix and postfix functionality to reverse inventory order before and after items
+        /// are removed for building or crafting.
         /// </remarks>
-        [HarmonyPatch(typeof(PlayerInventory), "RemoveCostMultiple")]
+        [HarmonyPatch(typeof(Inventory), "RemoveCostMultiple")]
+        [HarmonyPatch(typeof(Inventory), "RemoveCostMultipleIncludeSecondaryInventories")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage(
             "Performance",
             "CA1812:Avoid uninstantiated internal classes",
@@ -271,13 +240,9 @@ namespace DakotaHawkins
         private static class RemoveCostMultiplePatch
         {
             /// <summary>
-            /// PlayerInventory.RemoveCostMultiple prefix remembers the currently selected hotbar
-            /// slot index and reverses the player inventory.
+            /// Prefix reverses the inventory.
             /// </summary>
-            /// <param name="__instance">Player's inventory.</param>
-            /// <param name="__state">
-            /// Returns the player's currently selected hotbar slot index.
-            /// </param>
+            /// <param name="__instance">Inventory.</param>
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "Code Quality",
                 "IDE0051:Remove unused private members",
@@ -288,37 +253,20 @@ namespace DakotaHawkins
                 "SA1313:Parameter names should begin with lower-case letter",
                 Justification = "Required by Harmony"
             )]
-            private static void Prefix(PlayerInventory __instance, out int? __state)
+            private static void Prefix(Inventory __instance)
             {
-                __state = null;
-
-                if (__instance.hotbar == null)
-                {
-                    Log(
-                        LogType.Error,
-                        "PlayerInventory.RemoveCostMultiple.Prefix:\tnull Hotbar"
-                    );
-                    return;
-                }
-
-                // Remember the currently selected hotbar slot index (necessary when crafting, but
-                // not when building)
-                __state = __instance.hotbar.GetSelectedSlotIndex();
-
-                DebugLogHotbarSelection("Prefix Before Reverse", __instance);
-
                 // Reverse the inventory
                 __instance.allSlots.Reverse();
-
-                DebugLogHotbarSelection("Prefix After Reverse", __instance);
+                if (__instance.secondInventory != null)
+                {
+                    __instance.secondInventory.allSlots.Reverse();
+                }
             }
 
             /// <summary>
-            /// PlayerInventory.RemoveCostMultiple postfix re-reverses the player inventory to
-            /// restore its original order and resets the currently selected hotbar slot index.
+            /// Postfix re-reverses the inventory to restore its original order.
             /// </summary>
-            /// <param name="__instance">Player's inventory.</param>
-            /// <param name="__state">Player's originally selected hotbar slot index.</param>
+            /// <param name="__instance">Inventory.</param>
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "Code Quality",
                 "IDE0051:Remove unused private members",
@@ -329,69 +277,14 @@ namespace DakotaHawkins
                 "SA1313:Parameter names should begin with lower-case letter",
                 Justification = "Required by Harmony"
             )]
-            private static void Postfix(PlayerInventory __instance, int? __state)
+            private static void Postfix(Inventory __instance)
             {
-                if (__state == null)
-                {
-                    Log(
-                        LogType.Error,
-                        "PlayerInventory.RemoveCostMultiple.Postfix:\tnull Hotbar selected index"
-                    );
-                    return;
-                }
-
-                if (__instance.hotbar == null)
-                {
-                    Log(
-                        LogType.Error,
-                        "PlayerInventory.RemoveCostMultiple.Postfix:\tnull Hotbar"
-                    );
-                    return;
-                }
-
-                DebugLogHotbarSelection("Postfix Before Reverse", __instance);
-
                 // Reverse the inventory to restore original order
                 __instance.allSlots.Reverse();
-
-                DebugLogHotbarSelection("Postfix After Reverse", __instance);
-
-                // Re-set the selected hotbar slot index to its original value (necessary when
-                // crafting, but not when building)
-                __instance.hotbar.SetSelectedSlotIndex(__state ?? default(int));
-
-                DebugLogHotbarSelection("Postfix After Reset", __instance);
-            }
-
-            /// <summary>
-            /// Utility function to log the player's hotbar selection.
-            /// </summary>
-            /// <param name="calledWhen">When we're logging this info.</param>
-            /// <param name="inventory">Player's inventory.</param>
-            private static void DebugLogHotbarSelection(
-                string calledWhen,
-                PlayerInventory inventory
-            )
-            {
-                if (!debugEnabled)
+                if (__instance.secondInventory != null)
                 {
-                    return;
+                    __instance.secondInventory.allSlots.Reverse();
                 }
-
-                string selectedHotbarItem = "Nothing";
-                if (inventory.GetSelectedHotbarItem() != null)
-                {
-                    selectedHotbarItem = inventory.GetSelectedHotbarItem().UniqueName;
-                }
-
-                string logMessage = string.Format(
-                    CultureInfo.CurrentCulture,
-                    "PlayerInventory.RemoveCostMultiple.{0}:\tHotbar Selection:\t{1}\t{2}",
-                    calledWhen,
-                    inventory.hotbar.GetSelectedSlotIndex(),
-                    selectedHotbarItem
-                );
-                LogDebug(LogType.Log, logMessage);
             }
         }
     }

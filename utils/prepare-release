@@ -1,6 +1,63 @@
 #!/bin/bash
 
+####################################################################################################
+# Prepares a release
+#
+# Required arguments:
+#   (--test|--major|--minor|--patch)    Release type
+#
+# Optional arguments:
+#   --debug                             Runs in debug mode
+
+main() {
+    usage_help="Usage: prepare-release (--test|--major|--minor|--patch) [--debug]"
+    release_type=
+    debug_option=
+
+    shopt -s nocasematch
+    UNSET_NOCASEMATCH=1
+    while [[ $# -gt 0 ]]; do
+        case "$1" in
+            --test)
+                [[ -n "$release_type" ]] && error_exit "Multiple release types. $usage_help"
+                release_type=Test
+                shift
+                ;;
+            --major)
+                [[ -n "$release_type" ]] && error_exit "Multiple release types. $usage_help"
+                release_type=Major
+                shift
+                ;;
+            --minor)
+                [[ -n "$release_type" ]] && error_exit "Multiple release types. $usage_help"
+                release_type=Minor
+                shift
+                ;;
+            --patch)
+                [[ -n "$release_type" ]] && error_exit "Multiple release types. $usage_help"
+                release_type=Patch
+                shift
+                ;;
+            --debug)
+                debug_option=-DebugRelease
+                shift
+                ;;
+            *)
+                error_exit "Unrecognized argument. $usage_help"
+                ;;
+        esac
+    done
+    shopt -u nocasematch
+    UNSET_NOCASEMATCH=0
+
+    powershell ./raft-prepare-release/PrepareRelease.ps1 \
+        -Name "InventoryStack" \
+        -Type "$release_type" \
+        "$debug_option"
+}
+
 error_exit() {
+    [[ "$UNSET_NOCASEMATCH" = "1" ]] && shopt -u nocasematch
     echo "Error: $1" >&2
     echo
     exit 1
@@ -10,4 +67,9 @@ cd "$(dirname "$(readlink -f "$0")")" || {
     error_exit "Failed to cd to script directory."
 }
 
-MOD_NAME="InventoryStack" ./raft-prepare-release/prepare-release "$@"
+UNSET_NOCASEMATCH=0
+
+set -m
+trap "" SIGINT
+main "$@"
+exit 0
