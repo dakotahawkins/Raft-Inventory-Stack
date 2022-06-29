@@ -1,7 +1,8 @@
-//--------------------------------------------------------------------------------------------------
+﻿//--------------------------------------------------------------------------------------------------
 // <copyright file="InventoryStack.cs" company="Dakota Hawkins">
 //     Copyright (c) Dakota Hawkins. All rights reserved.
 // </copyright>
+// <summary>Implementation class for the Inventory Stack mod.</summary>
 // <license>
 //     MIT License
 //
@@ -26,10 +27,8 @@
 //     SOFTWARE.
 // </license>
 //--------------------------------------------------------------------------------------------------
-#pragma warning disable 1692 // Invalid number, triggered from the mod loader for the SA* pragmas
 #pragma warning disable SA1009 // ClosingParenthesisMustBeSpacedCorrectly
 #pragma warning disable SA1111 // ClosingParenthesisMustBeOnLineOfLastParameter
-#pragma warning restore 1692
 namespace DakotaHawkins
 {
     using System.Collections.Generic;
@@ -43,6 +42,11 @@ namespace DakotaHawkins
     /// <summary>
     /// Main mod class.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage(
+        "Naming",
+        "CA1711:Identifiers should not have incorrect suffix",
+        Justification = "Don't restrict the mod's name"
+    )]
     public class InventoryStack : Mod
     {
         /// <summary>
@@ -62,11 +66,6 @@ namespace DakotaHawkins
         /// <remarks>
         /// Toggle with the console command "InventoryStack ( d | debug )".
         /// </remarks>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Performance",
-            "CA1805:Do not initialize unnecessarily",
-            Justification = "Clarity")
-        ]
         private static bool debugEnabled = false;
 
         /// <summary>
@@ -81,10 +80,13 @@ namespace DakotaHawkins
         /// Called by the console command "InventoryStack".
         /// </remarks>
         /// <param name="args">Individual command.</param>
-        [ConsoleCommand(name: "InventoryStack", docs: "Run \"InventoryStack ( h | help )\" for more information.")]
+        [ConsoleCommand(
+            name: "InventoryStack",
+            docs: "Run \"InventoryStack ( h | help )\" for more information."
+        )]
         public static void RunCommand(string[] args)
         {
-            var command = args.FirstOrDefault();
+            string command = args.FirstOrDefault();
             if (command.IsNullOrEmpty() || new[] { "h", "help" }.Contains(command))
             {
                 PrintCommandHelp();
@@ -152,6 +154,11 @@ namespace DakotaHawkins
         /// </summary>
         /// <param name="type">Type of log message.</param>
         /// <param name="log">Log message.</param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage(
+            "CodeQuality",
+            "IDE0051:Remove unused private members",
+            Justification = "Future use."
+        )]
         private static void LogDebug(UnityEngine.LogType type, string log)
         {
             if (!debugEnabled)
@@ -171,7 +178,7 @@ namespace DakotaHawkins
         /// </remarks>
         private static void PrintCommandHelp(string error = "")
         {
-            var helpMessage = new List<string>
+            List<string> helpMessage = new List<string>
             {
                 string.Empty,
                 "Usage: <b>InventoryStack <i>[command]</i></b>",
@@ -196,7 +203,7 @@ namespace DakotaHawkins
                 );
             }
 
-            foreach (var helpLine in helpMessage)
+            foreach (string helpLine in helpMessage)
             {
                 Log(LogType.Log, helpLine);
             }
@@ -223,8 +230,8 @@ namespace DakotaHawkins
         }
 
         /// <summary>
-        /// Patches the Inventory RemoveCostMultiple and RemoveCostMultipleIncludeSecondaryInventories
-        /// methods.
+        /// Patches the Inventory RemoveCostMultiple and
+        /// RemoveCostMultipleIncludeSecondaryInventories methods.
         /// </summary>
         /// <remarks>
         /// Adds prefix and postfix functionality to reverse inventory order before and after items
@@ -232,35 +239,39 @@ namespace DakotaHawkins
         /// </remarks>
         [HarmonyPatch(typeof(Inventory), "RemoveCostMultiple")]
         [HarmonyPatch(typeof(Inventory), "RemoveCostMultipleIncludeSecondaryInventories")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage(
-            "Performance",
-            "CA1812:Avoid uninstantiated internal classes",
-            Justification = "Dynamically instantiated at run-time"
-        )]
         private static class RemoveCostMultiplePatch
         {
+            /// <summary>
+            /// Reverses the inventory.
+            /// </summary>
+            /// <param name="inventory">Inventory.</param>
+            private static void ReverseInventory(Inventory inventory)
+            {
+                inventory.allSlots.Reverse();
+                if (inventory.secondInventory != null)
+                {
+                    inventory.secondInventory.allSlots.Reverse();
+                }
+            }
+
             /// <summary>
             /// Prefix reverses the inventory.
             /// </summary>
             /// <param name="__instance">Inventory.</param>
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
-                "Code Quality",
+                "CodeQuality",
                 "IDE0051:Remove unused private members",
-                Justification = "Dynamically called at run-time"
+                Justification = "Called by game."
             )]
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "StyleCop.CSharp.NamingRules",
                 "SA1313:Parameter names should begin with lower-case letter",
-                Justification = "Required by Harmony"
-            )]
+                Justification = "Name mandated by Harmony.")
+            ]
             private static void Prefix(Inventory __instance)
             {
                 // Reverse the inventory
-                __instance.allSlots.Reverse();
-                if (__instance.secondInventory != null)
-                {
-                    __instance.secondInventory.allSlots.Reverse();
-                }
+                RemoveCostMultiplePatch.ReverseInventory(__instance);
             }
 
             /// <summary>
@@ -268,23 +279,19 @@ namespace DakotaHawkins
             /// </summary>
             /// <param name="__instance">Inventory.</param>
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
-                "Code Quality",
+                "CodeQuality",
                 "IDE0051:Remove unused private members",
-                Justification = "Dynamically called at run-time"
+                Justification = "Called by game."
             )]
             [System.Diagnostics.CodeAnalysis.SuppressMessage(
                 "StyleCop.CSharp.NamingRules",
                 "SA1313:Parameter names should begin with lower-case letter",
-                Justification = "Required by Harmony"
-            )]
+                Justification = "Name mandated by Harmony.")
+            ]
             private static void Postfix(Inventory __instance)
             {
                 // Reverse the inventory to restore original order
-                __instance.allSlots.Reverse();
-                if (__instance.secondInventory != null)
-                {
-                    __instance.secondInventory.allSlots.Reverse();
-                }
+                RemoveCostMultiplePatch.ReverseInventory(__instance);
             }
         }
     }

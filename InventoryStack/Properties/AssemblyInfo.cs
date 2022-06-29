@@ -1,7 +1,9 @@
-// <copyright file="AssemblyInfo.cs" company="Dakota Hawkins">
+﻿// <copyright file="AssemblyInfo.cs" company="Dakota Hawkins">
 // Copyright (c) Dakota Hawkins. All rights reserved.
 // </copyright>
+// <summary>Assembly attributes.</summary>
 
+using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -13,9 +15,13 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Dakota Hawkins")]
 [assembly: AssemblyProduct("InventoryStack")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyCopyright("Copyright ©  2022")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
+
+// CA1014: Mark assemblies with CLSCompliantAttribute. Must be false because
+// the code we are extending is not marked CLS compliant.
+[assembly: CLSCompliant(false)]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from

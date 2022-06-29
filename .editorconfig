@@ -1,6 +1,6 @@
 # Suppress: EC112
 [*]
-charset = utf-8
+charset = utf-8-bom
 end_of_line = lf
 insert_final_newline = true
 indent_style = space
@@ -14,18 +14,6 @@ max_line_length = 100
 # https://marketplace.visualstudio.com/items?itemName=PaulHarrington.EditorGuidelines
 guidelines = 100
 guidelines_style = 1px dotted gray
-
-# IDE0001: Simplify Names
-dotnet_diagnostic.IDE0001.severity = none
-
-# IDE0002: Simplify Member Access
-dotnet_diagnostic.IDE0002.severity = none
-
-# IDE0003: Remove qualification
-dotnet_style_qualification_for_property = false:none
-dotnet_style_qualification_for_method = false:none
-dotnet_style_qualification_for_event = false:none
-dotnet_style_qualification_for_field = false:none
 
 [*.json]
 indent_size = 2
